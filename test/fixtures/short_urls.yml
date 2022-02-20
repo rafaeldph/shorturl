@@ -1,0 +1,11 @@
+one:
+  domain_id: 1
+  url: www.example.com/path
+  short_code: ABCDE
+  visits: 0
+
+no_url:
+  domain_id: 1
+  short_code: ABCDF
+  visits: 0
+  

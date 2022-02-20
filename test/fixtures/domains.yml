@@ -1,0 +1,7 @@
+one:
+  url: www.example.com
+  alexa_rank: 25000
+
+no_url:
+  alexa_rank: 10000
+  
