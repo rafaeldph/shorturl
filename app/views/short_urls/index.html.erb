@@ -1,25 +1,4 @@
-<p id="notice"><%= notice %></p>
-
-<h1>Short Urls</h1>
-
-<table>
-  <thead>
-    <tr>
-      <th>Domain</th>
-      <th>Url</th>
-      <th>Short code</th>
-      <th>Visits</th>
-    </tr>
-  </thead>
-
-  <tbody>
-    <% @short_urls.each do |short_url| %>
-      <tr>
-        <td><%= short_url.domain_id %></td>
-        <td><%= short_url.url %></td>
-        <td><%= short_url.short_code %></td>
-        <td><%= short_url.visits %></td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
+<div id="content">
+  <h1>Short URL</h1>
+  <div id="app"></div>
+</div>

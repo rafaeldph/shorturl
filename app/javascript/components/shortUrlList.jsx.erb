@@ -1,0 +1,33 @@
+import React from 'react';
+
+export default function ShortUrlList() {
+  const [shortUrls, setShortUrls] = React.useState([]);
+
+  React.useEffect(() => {
+    fetch('<%= Rails.application.routes.url_helpers.short_urls_path(format: "json").to_s %>')
+      .then(response => response.json())
+      .then(setShortUrls);
+  }, []);
+
+  return (
+    <table>
+      <thead>
+        <tr>
+          <th>URL</th>
+          <th>Código corto</th>
+          <th>Visitas</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {shortUrls.map(({ url, short_code, visits }, i) =>
+          <tr key={i}>
+            <td>{url}</td>
+            <td>{short_code}</td>
+            <td>{visits}</td>
+          </tr>
+        )}
+      </tbody>
+    </table>
+  );
+}
