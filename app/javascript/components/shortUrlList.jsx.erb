@@ -1,10 +1,11 @@
 import React from 'react';
 
-export default function ShortUrlList() {
+
+export default function ShortUrlList({ copyToClipboard }) {
   const [shortUrls, setShortUrls] = React.useState([]);
 
   React.useEffect(() => {
-    fetch('<%= Rails.application.routes.url_helpers.short_urls_path(format: "json").to_s %>')
+    fetch('<%= Rails.application.routes.url_helpers.short_urls_path(format: "json") %>')
       .then(response => response.json())
       .then(setShortUrls);
   }, []);
@@ -20,10 +21,15 @@ export default function ShortUrlList() {
       </thead>
 
       <tbody>
-        {shortUrls.map(({ url, short_code, visits }, i) =>
+        {shortUrls.map(({ url, short_code, short_url, visits }, i) =>
           <tr key={i}>
             <td>{url}</td>
-            <td>{short_code}</td>
+            <td>
+              {short_code}
+              <a className="copy-icon" onClick={() => copyToClipboard(short_url)}>
+                <i className="material-icons">content_copy</i>
+              </a>
+            </td>
             <td>{visits}</td>
           </tr>
         )}

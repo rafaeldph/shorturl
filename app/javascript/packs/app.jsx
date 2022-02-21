@@ -1,12 +1,23 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import ShortUrlForm from '../components/shortUrlForm';
 import ShortUrlList from '../components/shortUrlList';
 
 
-function App({ name }) {
+function App() {
+  const copyToClipboard = (content) => {
+    const el = document.createElement('textarea');
+    el.value = content;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+  };
+
   return (
     <>
-      <ShortUrlList />
+      <ShortUrlForm copyToClipboard={copyToClipboard} />
+      <ShortUrlList copyToClipboard={copyToClipboard} />
     </>
   );
 }

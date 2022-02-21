@@ -3,21 +3,13 @@ class ShortUrlsController < ApplicationController
     @short_urls = ShortUrl.includes(:domain).order(created_at: :desc).limit(10)
   end
 
-  def show
-    @short_url = ShortUrl.find(params[:id])
-  end
-
   def create
-    @short_url = ShortUrl.new(params.require(:short_url).permit(:domain_id, :url))
+    @short_url = ShortUrl.find_or_create_by(params.require(:short_url).permit(:url))
 
-    respond_to do |format|
-      if @short_url.save
-        format.html { redirect_to short_url_url(@short_url), notice: "Short url was successfully created." }
-        format.json { render :show, status: :created, location: @short_url }
-      else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @short_url.errors, status: :unprocessable_entity }
-      end
+    if @short_url.save
+      render :show, status: :created, short_url: @short_url
+    else
+      render json: @short_url.errors, status: :unprocessable_entity
     end
   end
 

@@ -1,0 +1,70 @@
+import React from 'react';
+
+
+export default function ShortUrlForm({ copyToClipboard }) {
+  const [url, setUrl] = React.useState('');
+  const [error, setError] = React.useState('');
+  const [shortCode, setShortCode] = React.useState('');
+  const [shortUrl, setShortUrl] = React.useState('');
+  const [alexaRank, setAlexaRank] = React.useState('');
+
+  React.useEffect(() => {
+    setShortCode('');
+    setAlexaRank('');
+    setError('');
+  }, [url]);
+
+  const sendForm = () => {
+    const csrf = document.querySelector("meta[name='csrf-token']").getAttribute("content");
+
+    fetch('<%= Rails.application.routes.url_helpers.short_urls_path(format: "json") %>', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': csrf,
+      },
+      body: JSON.stringify({
+        short_url: {
+          url,
+        },
+      }),
+    }).then(response => response.json()).then(({ short_code, short_url, alexa_rank }) => {
+      setShortCode(short_code);
+      setShortUrl(short_url);
+      setAlexaRank(alexa_rank);
+    });
+  };
+
+  return (
+    <form className="row valign-wrapper">
+      <div className="input-field col s6 m3">
+        <input 
+          placeholder="URL" 
+          id="url" 
+          type="text" 
+          className="validate" 
+          value={url} 
+          onChange={({ target: { value } }) => setUrl(value)} 
+        />
+      </div>
+      <div className="input-field col s6 m3">
+        {shortCode &&
+          <p>
+            {shortCode} 
+            <a class="copy-icon" onClick={() => copyToClipboard(shortUrl)}>
+              <i class="material-icons">content_copy</i>
+            </a>
+          </p>
+        }
+      </div>
+      <div className="col s6 m3">
+        {alexaRank && 
+          <p><b>Ranking de alexa:</b> {alexaRank}</p>
+        }
+      </div>
+      <div className="col s6 m3 right-align">
+        <button type="button" className="btn waves-effect waves-light" onClick={sendForm}>Generar</button>
+      </div>
+    </form>
+  );
+}

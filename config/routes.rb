@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
-  resources :short_urls, only: [:index]
-  resources :short_urls, only: [:show, :create], constraints: { format: 'json' }
+  get 'short_urls', to: 'short_urls#index'
+  post 'short_urls', to: 'short_urls#create', constraints: { format: 'json' }
 
   get ':short_code', to: 'short_urls#redirect', as: :redirect
 
