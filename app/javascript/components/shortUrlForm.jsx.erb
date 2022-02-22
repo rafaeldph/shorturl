@@ -16,15 +16,10 @@ export default function ShortUrlForm({ copyToClipboard }) {
   }, [url]);
 
   const sendForm = () => {
-    const csrf = document.querySelector("meta[name='csrf-token']").getAttribute("content");
-
-    setLoading(true)
+    setLoading(true);
+    
     fetch('<%= Rails.application.routes.url_helpers.short_urls_path(format: "json") %>', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRF-Token': csrf,
-      },
       body: JSON.stringify({
         short_url: {
           url,

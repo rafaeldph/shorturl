@@ -1,4 +1,6 @@
 class ShortUrlsController < ApplicationController
+  skip_before_action :verify_authenticity_token
+
   def index
     if params[:format] == 'json'
       domains = params[:domains].to_s.split(',').map(&:to_i).join(',')
