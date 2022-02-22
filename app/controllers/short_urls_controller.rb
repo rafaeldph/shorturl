@@ -30,7 +30,7 @@ class ShortUrlsController < ApplicationController
     if @short_url.save
       render :show, status: :created, short_url: @short_url
     else
-      render json: @short_url.errors, status: :unprocessable_entity
+      render json: { error: "El texto debe ser una URL válida" }, status: :unprocessable_entity
     end
   end
 

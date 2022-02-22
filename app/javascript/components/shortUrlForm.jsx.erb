@@ -30,10 +30,15 @@ export default function ShortUrlForm({ copyToClipboard }) {
           url,
         },
       }),
-    }).then(response => response.json()).then(({ short_code, short_url, alexa_rank }) => {
-      setShortCode(short_code);
-      setShortUrl(short_url);
-      setAlexaRank(alexa_rank);
+    }).then(response => response.json()).then(({ error, short_code, short_url, alexa_rank }) => {
+      if (error) {
+        setError(error);
+      } else {
+        setShortCode(short_code);
+        setShortUrl(short_url);
+        setAlexaRank(alexa_rank);
+      }
+    }).finally(() => {
       setLoading(false);
     });
   };
@@ -68,12 +73,15 @@ export default function ShortUrlForm({ copyToClipboard }) {
         </div>
       ) : (
         <>
-          <div className="input-field col s6 m3">
+          <div className="col s6 m3">
+            {error &&
+              <p className="text-error">{error}</p>
+            }
             {shortCode &&
               <p>
                 {shortCode} 
-                <a class="copy-icon" onClick={() => copyToClipboard(shortUrl)}>
-                  <i class="material-icons">content_copy</i>
+                <a className="copy-icon" onClick={() => copyToClipboard(shortUrl)}>
+                  <i className="material-icons">content_copy</i>
                 </a>
               </p>
             }

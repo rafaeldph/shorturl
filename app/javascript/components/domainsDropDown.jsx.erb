@@ -13,7 +13,9 @@ export default function DomainsDropDown({ domains, setDomains, filterByDomains }
       await fetch(`<%= Rails.application.routes.url_helpers.short_urls_domains_path(format: "json") %>?url=${domainFilter}`)
         .then(response => response.json())
         .then(setDomains)
-        .then(() => setLoading(false));
+        .finally(() => {
+          setLoading(false);
+        });
     };
 
     const timer = setTimeout(() => {
@@ -91,7 +93,7 @@ export default function DomainsDropDown({ domains, setDomains, filterByDomains }
 
         <div className="row">
           <div className="col">
-            <button class="btn" onClick={submit}>Filtrar</button>
+            <button className="btn" onClick={submit}>Filtrar</button>
           </div>
         </div>
       </div>
