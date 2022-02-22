@@ -1,6 +1,19 @@
 class ShortUrlsController < ApplicationController
   def index
-    @short_urls = ShortUrl.includes(:domain).order(created_at: :desc).limit(10)
+    filter = ''
+    domains = params[:domains].split(',').map(&:to_i).join(',')
+    unless domains.blank?
+      filter = "short_urls.domain_id IN (#{domains})"
+    end
+
+    @short_urls = ShortUrl.includes(:domain).where(filter).order(created_at: :desc).limit(10)
+  end
+  
+  def domains
+    ids = ShortUrl.select('domain_id, COUNT(*) AS total').group(:domain_id).order('total DESC').collect(&:domain_id)
+    @domains = Domain.where("url ILIKE ?", "%#{params[:url]}%").sort_by {|d| ids.index(d.id) || (2**(0.size * 8 -2) -1) }.take(5)
+
+    render json: @domains.to_json(except: [:created_at, :updated_at])
   end
 
   def create

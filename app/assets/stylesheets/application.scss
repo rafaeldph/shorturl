@@ -20,3 +20,23 @@ thead tr {
         font-size: 16px;
     }
 }
+
+#app table p, #app .dropdown-content p {
+    margin: 0;
+}
+
+.relative {
+    position: relative;
+
+    .dropdown-domains {
+        right: 0;
+        left: unset;
+        overflow: unset;
+
+        .close-button {
+            position: absolute;
+            top: -15px;
+            right: -15px;
+        }
+    }
+}

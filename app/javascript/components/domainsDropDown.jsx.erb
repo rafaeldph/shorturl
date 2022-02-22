@@ -1,0 +1,100 @@
+import React from 'react';
+
+
+export default function DomainsDropDown({ domains, setDomains, filterShortUrls }) {
+  const [filterVisibility, setFilterVisibility] = React.useState(false);
+  const [domainFilter, setDomainFilter] = React.useState('');
+  const [loading, setLoading] = React.useState(false);
+
+  React.useEffect(() => {
+    setLoading(true);
+    
+    const fetchData = async () => {
+      await fetch(`<%= Rails.application.routes.url_helpers.short_urls_domains_path(format: "json") %>?url=${domainFilter}`)
+        .then(response => response.json())
+        .then(setDomains)
+        .then(() => setLoading(false));
+    };
+
+    const timer = setTimeout(() => {
+      fetchData();
+    }, 350);
+
+    return () => clearTimeout(timer);
+  }, [domainFilter]);
+
+  const checkDomain = (index, value) => {
+    let currentDomains = [...domains]
+    currentDomains[index].checked = value;
+    setDomains(currentDomains);
+  };
+
+  const submit = () => {
+    setFilterVisibility(false);
+    filterShortUrls();
+  };
+
+  return (
+    <div className="row right-align relative">
+      <button className="btn" onClick={() => setFilterVisibility(true)}>
+        <i className="material-icons">menu</i>
+      </button>
+      
+      <div 
+        className="dropdown-content dropdown-domains left-align" 
+        style={{ 
+          display: filterVisibility ? 'block' : 'none',
+          opacity: filterVisibility ? 1 : 0,
+        }}
+      >
+        <button 
+          className="btn-floating waves-effect waves-light red close-button" 
+          onClick={() => setFilterVisibility(false)}
+        >X</button>
+        
+        <div className="row">
+          <div className="col">
+            <input type="text" value={domainFilter} onChange={({ target: { value } }) => setDomainFilter(value)} />
+          </div>
+        </div>
+
+        {loading &&
+          <div className="row center-align">
+            <div className="preloader-wrapper small active">
+              <div className="spinner-layer spinner-blue-only">
+                <div className="circle-clipper left">
+                  <div className="circle"></div>
+                </div>
+                <div className="gap-patch">
+                  <div className="circle"></div>
+                </div>
+                <div className="circle-clipper right">
+                  <div className="circle"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+
+        {!loading && domains.map(({ url, checked }, id) =>
+          <div key={id} className="row">
+            <div className="col">
+              <p>
+                <label>
+                  <input type="checkbox" defaultChecked={checked} onChange={() => checkDomain(id, !checked)} />
+                  <span>{url}</span>
+                </label>
+              </p>
+            </div>
+          </div>
+        )}
+
+        <div className="row">
+          <div className="col">
+            <button class="btn" onClick={submit}>Filtrar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
