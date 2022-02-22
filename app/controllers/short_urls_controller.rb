@@ -1,12 +1,20 @@
 class ShortUrlsController < ApplicationController
   def index
-    filter = ''
-    domains = params[:domains].split(',').map(&:to_i).join(',')
-    unless domains.blank?
-      filter = "short_urls.domain_id IN (#{domains})"
-    end
+    if params[:format] == 'json'
+      domains = params[:domains].to_s.split(',').map(&:to_i).join(',')
+      unless domains.blank?
+        filter = "short_urls.domain_id IN (#{domains})"
+      end
 
-    @short_urls = ShortUrl.includes(:domain).where(filter).order(created_at: :desc).limit(10)
+      @limit = 10
+
+      @total = ShortUrl.where(filter).count
+      @page = params[:page].to_i
+      @page = 1 if @page > @total || @page < 1
+      @last_page = (@total.to_f / @limit.to_f).ceil
+
+      @short_urls = ShortUrl.includes(:domain).where(filter).order(created_at: :desc).limit(@limit).offset((@page - 1) * @limit)
+    end
   end
   
   def domains
@@ -32,6 +40,8 @@ class ShortUrlsController < ApplicationController
     if short_url
       short_url.increment!(:visits)
       redirect_to short_url.url
+    else
+      render file: "#{Rails.root}/public/404", layout: false, status: :not_found
     end
   end
 end

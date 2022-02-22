@@ -5,24 +5,42 @@ import DomainsDropDown from './domainsDropDown';
 export default function ShortUrlList({ copyToClipboard }) {
   const [shortUrls, setShortUrls] = React.useState([]);
   const [domains, setDomains] = React.useState([]);
+  const [checkedDomains, setCheckedDomains] = React.useState('');
+  const [page, setPage] = React.useState(1);
+  const [lastPage, setLastPage] = React.useState(0);
   const [loading, setLoading] = React.useState(false);
 
   React.useEffect(() => {
-    filterShortUrls();
-  }, []);
-
-  const filterShortUrls = () => {
     setLoading(true);
-
-    fetch(`<%= Rails.application.routes.url_helpers.short_urls_path(format: "json") %>?domains=${domains.filter(({ checked }) => checked).map(({ id }) => id).join(',')}`)
+    
+    const fetchData = async () => {
+      await fetch(`<%= Rails.application.routes.url_helpers.short_urls_path(format: "json") %>?page=${page}&domains=${checkedDomains}`)
       .then(response => response.json())
-      .then(setShortUrls)
-      .then(() => setLoading(false));
+      .then(({ pagination: { last_page }, short_urls }) => {
+        setShortUrls(short_urls);
+        setLastPage(last_page);
+      }).then(() => setLoading(false));
+    };
+
+    const timer = setTimeout(() => {
+      fetchData();
+    }, 350);
+
+    return () => clearTimeout(timer);
+  }, [checkedDomains, page]);
+
+  const filterByDomains = () => {
+    setPage(1);
+    setCheckedDomains(domains.filter(({ checked }) => checked).map(({ id }) => id).join(','));
   };
 
   return (
     <div>
-      <DomainsDropDown domains={domains} setDomains={setDomains} filterShortUrls={filterShortUrls} />
+      <DomainsDropDown 
+        domains={domains} 
+        setDomains={setDomains} 
+        filterByDomains={filterByDomains}
+      />
 
       <table>
         <thead>
@@ -72,6 +90,36 @@ export default function ShortUrlList({ copyToClipboard }) {
             </tr>
           )}
         </tbody>
+
+        <tfoot>
+          <tr>
+            <td colspan="2" className="right-align">
+              <ul className="pagination">
+                <li className={page === 1 && 'disabled'}>
+                  <a onClick={() => page !== 1 && setPage(1)}>
+                    <i class="material-icons">first_page</i>
+                  </a>
+                </li>
+                <li className={page === 1 && 'disabled'}>
+                  <a onClick={() => page !== 1 && setPage(page - 1)}>
+                    <i class="material-icons">chevron_left</i>
+                  </a>
+                </li>
+                <li className={page === lastPage && 'disabled'}>
+                  <a onClick={() => page !== lastPage && setPage(page + 1)}>
+                    <i class="material-icons">chevron_right</i>
+                  </a>
+                </li>
+                <li className={page === lastPage && 'disabled'}>
+                  <a onClick={() => page !== lastPage && setPage(lastPage)}>
+                    <i class="material-icons">last_page</i>
+                  </a>
+                </li>
+              </ul>
+              <p>Página {page} de {lastPage}</p>
+            </td>
+          </tr>
+        </tfoot>
       </table>
     </div>
   );
